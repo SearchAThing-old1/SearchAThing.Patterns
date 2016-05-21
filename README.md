@@ -1,0 +1,3 @@
+# SearchAThing.Patterns
+
+Software patterns
