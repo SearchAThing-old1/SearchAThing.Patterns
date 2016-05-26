@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("StatusBarTaskDispatcher")]
+[assembly: AssemblyTitle("MongoDBWpf")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StatusBarTaskDispatcher")]
+[assembly: AssemblyProduct("MongoDBWpf")]
 [assembly: AssemblyCopyright("Copyright © Lorenzo Delana 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
