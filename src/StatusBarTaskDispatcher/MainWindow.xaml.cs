@@ -60,14 +60,17 @@ namespace StatusBarTaskDispatcher
 
         async Task DoSomeJob(int job)
         {
-            await Task.Run(async () =>
-            {
+            // not necessary to run a new Task inside
+            // the method will run in a task cause its Task signature        
+
+            //await Task.Run(async () =>
+            //{
                 for (int i = 0; i < 100; ++i)
                 {
                     global.StatusManager.Status = $"job{job} working {i}";
                     await Task.Delay(50);
                 }
-            });
+            //});
         }
 
     }
