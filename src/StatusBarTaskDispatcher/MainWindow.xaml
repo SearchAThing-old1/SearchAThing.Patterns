@@ -17,8 +17,15 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Run a job" Margin="10" Padding="10" Click="Button_Click"/>
-            <TextBox Grid.Column="1" x:Name="log" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" Width="200" IsReadOnly="True" Margin="10"/>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+            <Button Grid.Column="0" Grid.Row="0" Content="Run a job (Task delay)" Margin="10" Padding="10" Click="Button_Click"/>
+            <Button Grid.Column="0" Grid.Row="1" Content="Run a job (Thread sleep)" Margin="10" Padding="10" Click="Button2_Click"/>
+            
+            <TextBox Grid.Column="1" Grid.RowSpan="2" x:Name="log" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" Width="200" IsReadOnly="True" Margin="10"/>
         </Grid>
 
         <TextBlock Grid.Row="1" x:Name="statusTblk"/>

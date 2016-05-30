@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,28 +50,60 @@ namespace StatusBarTaskDispatcher
         {
             var j = ++job;
 
-            log.Text += $"job{j} started\r\n";            
+            log.Text += $"job{j} started\r\n";
             var idStatus = global.StatusManager.NewStatus($"doing job {j}");
             await DoSomeJob(j);
             global.StatusManager.ReleaseStatus(idStatus);
 
             log.Text += $"job{j} finished\r\n";
-            if (global.StatusManager.Status == "Ready.") MessageBox.Show("Ready");            
+            if (global.StatusManager.Status == "Ready.") MessageBox.Show("Ready");
         }
 
         async Task DoSomeJob(int job)
         {
             // not necessary to run a new Task inside
-            // the method will run in a task cause its Task signature        
+            // the method will run as task cause its async Task signature
+            // and it will run async ( in background )     
 
-            //await Task.Run(async () =>
+            // if no await in the body the async has no effect and the task run
+            // in foreground ( or you can in that case run and await a task inside it - see DoSomeJob2 )
+
+            //await Task.Run(() =>
             //{
+            for (int i = 0; i < 100; ++i)
+            {
+                global.StatusManager.Status = $"job{job} working {i}";
+                await Task.Delay(50);
+            }
+            //});
+        }
+
+        private async void Button2_Click(object sender, RoutedEventArgs e)
+        {
+            var j = ++job;
+
+            log.Text += $"job{j} started\r\n";
+            var idStatus = global.StatusManager.NewStatus($"doing job {j}");
+            await DoSomeJob2(j);
+            global.StatusManager.ReleaseStatus(idStatus);
+
+            log.Text += $"job{j} finished\r\n";
+            if (global.StatusManager.Status == "Ready.") MessageBox.Show("Ready");
+        }
+
+        async Task DoSomeJob2(int job)
+        {
+            await Task.Run(() =>
+            {
                 for (int i = 0; i < 100; ++i)
                 {
                     global.StatusManager.Status = $"job{job} working {i}";
-                    await Task.Delay(50);
+                    // using Thread sleep not enter the Task management
+                    // then this example demonstarte the await Task.Run(()
+                    // open a background job effectively
+                    Thread.Sleep(50);
                 }
-            //});
+            });
         }
 
     }
