@@ -105,6 +105,8 @@ namespace UITask
 
                 while ((DateTime.Now - begin).TotalSeconds <= 10)
                 {
+                    // note that here I use Dispatcher.Invoke because the lambda method () => of the Task
+                    // is not async, but if it was then you need to use Dispatcher.InvokeAsync(() => { });
                     Dispatcher.Invoke(() => btnDoJob.Content = DateTime.Now.Millisecond.ToString());
                 }
             });
