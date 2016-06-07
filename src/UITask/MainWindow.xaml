@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Button x:Name="btn" Content="X" Click="btn_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="0" x:Name="btn" Content="X" Click="btn_Click"/>
+        <Button Grid.Row="1" x:Name="btnDoJob" Content="Do intenstive job" Click="btnDoJob_Click"/>
     </Grid>
 </Window>

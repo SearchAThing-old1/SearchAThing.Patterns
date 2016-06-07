@@ -95,6 +95,28 @@ namespace UITask
             return true;
         }
 
+        //-------------------------
+
+        async Task IntensiveJob()
+        {
+            await Task.Run(() =>
+            {
+                var begin = DateTime.Now;
+
+                while ((DateTime.Now - begin).TotalSeconds <= 10)
+                {
+                    Dispatcher.Invoke(() => btnDoJob.Content = DateTime.Now.Millisecond.ToString());
+                }
+            });
+        }
+
+        private async void btnDoJob_Click(object sender, RoutedEventArgs e)
+        {
+            await IntensiveJob();
+
+            MessageBox.Show("Finished");
+        }
+
     }
 
 }
