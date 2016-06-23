@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoRepository;
+using Repository.Mongo;
 
-namespace MongoDBWpf.Ents
+namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
     public class Contact : Entity

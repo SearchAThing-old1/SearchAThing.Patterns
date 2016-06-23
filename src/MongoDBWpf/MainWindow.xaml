@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MongoDBWpf"
-        xmlns:Toolkit="clr-namespace:SearchAThing.Wpf.Toolkit;assembly=SearchAThing.Wpf.Toolkit" x:Class="MongoDBWpf.MainWindow"
+        xmlns:Toolkit="clr-namespace:SearchAThing.Wpf.Toolkit;assembly=SearchAThing.Wpf.Toolkit" x:Class="SearchAThing.Patterns.MongoDBWpf.MainWindow"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="MongoDBWpf" Height="350" Width="525">

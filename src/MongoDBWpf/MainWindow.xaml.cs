@@ -24,21 +24,21 @@
 #endregion
 
 using MongoDB.Driver;
-using MongoDBWpf.Ents;
+using SearchAThing.Patterns.MongoDBWpf.Ents;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Linq;
-using MongoRepository;
+using Repository.Mongo;
 
-namespace MongoDBWpf
+namespace SearchAThing.Patterns.MongoDBWpf
 {
 
     public partial class MainWindow : Window
     {
         
         ObservableCollection<Contact> obc;
-        MongoRepository<Contact> contacts;
+        Repository<Contact> contacts;
 
         public MainWindow()
         {
@@ -57,8 +57,8 @@ namespace MongoDBWpf
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            contacts = new MongoRepository<Contact>("mongodb://localhost:27017/mongodbwpf");            
-            obc = new ObservableCollection<Contact>(contacts);
+            contacts = new Repository<Contact>("mongodb://localhost:27017/searchathing_patterns_mongodbwpf");            
+            obc = new ObservableCollection<Contact>(contacts.FindAll());
             dg.ItemsSource = obc;
         }
 
@@ -66,7 +66,7 @@ namespace MongoDBWpf
         {
             var newContact = new Contact() { Name = "newName", Phone = "newPhone" };
             obc.Add(newContact);
-            contacts.Add(newContact);
+            contacts.Insert(newContact);
         }
 
         private void Del_Click(object sender, RoutedEventArgs e)
