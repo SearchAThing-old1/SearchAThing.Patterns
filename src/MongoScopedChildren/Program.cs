@@ -23,6 +23,7 @@
 */
 #endregion
 
+using MongoDB.Bson.Serialization.Attributes;
 using Repository.Mongo;
 using SearchAThing.Core;
 using System;
@@ -109,9 +110,9 @@ namespace MongoScopedChildren
         /// <summary>
         /// Constructor for run-time object allocation.
         /// </summary>        
-        public ChildClass(BaseDoc __BaseDoc)
+        public ChildClass(BaseDoc _BaseDoc)
         {
-            _BaseDoc = __BaseDoc;
+            BaseDoc = _BaseDoc;
         }
 
         #region ISupportInitialize
@@ -125,15 +126,9 @@ namespace MongoScopedChildren
         }
         #endregion
 
-        #region BaseDoc [pfg]
-        BaseDoc _BaseDoc;
-        public BaseDoc BaseDoc
-        {
-            get
-            {
-                return _BaseDoc;
-            }
-        }
+        #region BaseDoc [pgps]
+        [BsonIgnore]
+        public BaseDoc BaseDoc { get; private set; }
         #endregion
 
         #region IScopeChild
@@ -142,7 +137,7 @@ namespace MongoScopedChildren
         /// </summary>        
         public void SetScope(object root)
         {
-            _BaseDoc = root as BaseDoc;
+            BaseDoc = root as BaseDoc;
         }
         #endregion
 
