@@ -21,3 +21,11 @@ Mongodb GUI WPF mappings.
 
 Access the root document from the nested child objects.
 [Code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/MongoScopedChildren/Program.cs)
+
+## Mongo DB
+
+### MongoConcurrency
+
+Handles in a semi-automatic way update of only changed fields.
+
+[Example](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/MongoConcurrency)
