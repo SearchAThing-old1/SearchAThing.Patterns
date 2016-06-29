@@ -25,10 +25,12 @@ Third column after display current db content after each opeation.
 Entity1.A = a1
 Entity1.Nested.C = c1
 Entity1.Children.First().C = cc1
+Entity1.Children.Add(new { C = ee1, D = ff1 })
 
 Entity2.B = b2
 Entity2.Nested.D = d2
 Entity2.Children.First().D = dd2
+Entity2.Children.Delete: 2th ( C = ee, D = ff )
 ```
 
 Here intentionally only not overlapped fields are updated, the intent is to see after save of Entity1 and then of Entity2 that last save of Entity2 not write its unmodified fields in order to avoid to overwrite changes done from Entity1 save.
@@ -52,14 +54,14 @@ Entity2 save
     - implements `IMongoEntityTrackChanges` interface:
     ```csharp
     #region IMongoEntityTrackChanges
-    HashSet<string> _ChangedProperties;
-    public HashSet<string> ChangedProperties { get { return _ChangedProperties; } }
+    MongoEntityTrackChanges _TrackChanges;       
+    public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }        
     #endregion
     ```
 
     - when not null add the changed property name to the ChangedProperties hashset. In fact this will be null during the loading phase in order to avoid auto-change:
     ```csharp
-    ChangedProperties?.Add("A"); // use of ? operator ( until endinit is null )
+    TrackChanges?.ChangedProperties.Add("A"); // use of ? operator ( until endinit is null )
     ```
 
     - implements `ISupportInitialize` interface. This way allow to allocate ChangedProperties hashset to be used when properties will be changed:
@@ -71,12 +73,12 @@ Entity2 save
 
     public void EndInit()
     {
-        _ChangedProperties = new HashSet<string>();
+        _TrackChanges = new MongoEntityTrackChanges();
     }
     #endregion
     ```
 
-    - save changes using the UpdateDefinition array from the Changes extension method. (Note: This will clear the ChangedProperties)
+    - save changes using `UpdateWithTrack` extension to the entity.
     ```csharp
-    repo.Update(Entity1, Entity1.Changes(repo.Updater));
+    Entity1.UpdateWithTrack(repo);
     ```

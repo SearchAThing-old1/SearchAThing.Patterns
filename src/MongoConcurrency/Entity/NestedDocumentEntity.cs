@@ -25,6 +25,7 @@
 
 using System.ComponentModel;
 using System.Collections.Generic;
+using SearchAThing.MongoDB;
 
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
@@ -33,8 +34,8 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
     {
 
         #region IMongoEntityTrackChanges
-        HashSet<string> _ChangedProperties;
-        public HashSet<string> ChangedProperties { get { return _ChangedProperties; } }
+        MongoEntityTrackChanges _TrackChanges;
+        public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }
         #endregion
 
         #region ISupportInitialize
@@ -44,7 +45,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
 
         public void EndInit()
         {
-            _ChangedProperties = new HashSet<string>();
+            _TrackChanges = new MongoEntityTrackChanges();
         }
         #endregion
 
@@ -69,7 +70,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
                 if (_C != value)
                 {
                     _C = value;
-                    ChangedProperties?.Add("C"); // use of ? operator ( until endinit is null )
+                    TrackChanges?.ChangedProperties.Add("C"); // use of ? operator ( until endinit is null )
                     SendPropertyChanged("C");
                 }
             }
@@ -89,7 +90,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
                 if (_D != value)
                 {
                     _D = value;
-                    ChangedProperties?.Add("D"); // use of ? operator ( until endinit is null )
+                    TrackChanges?.ChangedProperties.Add("D"); // use of ? operator ( until endinit is null )
                     SendPropertyChanged("D");
                 }
             }

@@ -30,6 +30,7 @@ using System.Windows;
 using System.Linq;
 using Repository.Mongo;
 using SearchAThing;
+using MongoDB.Bson.Serialization;
 
 namespace SearchAThing.Patterns.MongoDBWpf
 {
@@ -115,6 +116,7 @@ namespace SearchAThing.Patterns.MongoDBWpf
                 {
                     var obc = new ObservableCollection<NestedDocumentEntity>();
                     obc.Add(new NestedDocumentEntity() { C = "cc", D = "dd" });
+                    obc.Add(new NestedDocumentEntity() { C = "ee", D = "ff" });
                     doc.Children = obc;
                 }
                 repo.Insert(doc);
@@ -138,12 +140,22 @@ namespace SearchAThing.Patterns.MongoDBWpf
             Entity1.A = "a1";
             Entity1.Nested.C = "c1";
             Entity1.Children.First().C = "cc1";
-            System.Console.WriteLine($"Entity1.Children.First().ChangedProperties.Count={Entity1.Children.First().ChangedProperties.Count}");
+            {
+                // add item1
+                var newItem1 = new NestedDocumentEntity() { C = "ee1", D = "ff1" };
+                Entity1.Children.Add(newItem1); // add to OBC
+                Entity1.Children.SetAsNew(Entity1, newItem1); // set as added
+            }
 
             Entity2.B = "b2";
             Entity2.Nested.D = "d2";
             Entity2.Children.First().D = "dd2";
-            System.Console.WriteLine($"Entity2.Children.First().ChangedProperties.Count={Entity2.Children.First().ChangedProperties.Count}");
+            {
+                // del item2
+                var oldItem2 = Entity2.Children.Skip(1).First();
+                Entity2.Children.Remove(oldItem2); // remove from OBC                
+                Entity2.Children.SetAsDeleted(Entity2, oldItem2); // set as deleted                
+            }
         }
 
         private void Save1_Click(object sender, RoutedEventArgs e)
@@ -152,10 +164,7 @@ namespace SearchAThing.Patterns.MongoDBWpf
 
             var id = Entity1.Id;
 
-            var updates = Entity1.Changes(repo.Updater).ToArray();
-            System.Console.WriteLine($"Save1 : updates {updates.Length}");
-
-            repo.Update(Entity1, updates);
+            Entity1.UpdateWithTrack(repo); // commit with track changes
 
             LoadEntityDBCurrent();
         }
@@ -165,10 +174,7 @@ namespace SearchAThing.Patterns.MongoDBWpf
             var repo = new Repository<DocumentEntity>(ConnectionString);
             var id = Entity2.Id;
 
-            var updates = Entity2.Changes(repo.Updater).ToArray();
-            System.Console.WriteLine($"Save2 : updates {updates.Length}");
-
-            repo.Update(Entity2, updates);
+            Entity2.UpdateWithTrack(repo); // commit with track changes
 
             LoadEntityDBCurrent();
         }
