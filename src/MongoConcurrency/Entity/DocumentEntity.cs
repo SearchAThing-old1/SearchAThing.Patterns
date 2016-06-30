@@ -35,6 +35,11 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
     public class DocumentEntity : Entity, INotifyPropertyChanged, IMongoEntityTrackChanges, ISupportInitialize
     {
 
+        public DocumentEntity()
+        {
+            _TrackChanges = new MongoEntityTrackChanges();
+        }
+
         #region IMongoEntityTrackChanges
         MongoEntityTrackChanges _TrackChanges;       
         public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }        
@@ -43,6 +48,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
         #region ISupportInitialize
         public void BeginInit()
         {
+            _TrackChanges = null;
         }
 
         public void EndInit()

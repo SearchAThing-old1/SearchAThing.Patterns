@@ -33,6 +33,11 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
     public class NestedDocumentEntity : INotifyPropertyChanged, IMongoEntityTrackChanges, ISupportInitialize
     {
 
+        public NestedDocumentEntity()
+        {
+            _TrackChanges = new MongoEntityTrackChanges();
+        }
+
         #region IMongoEntityTrackChanges
         MongoEntityTrackChanges _TrackChanges;
         public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }
@@ -41,6 +46,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
         #region ISupportInitialize
         public void BeginInit()
         {
+            _TrackChanges = null;
         }
 
         public void EndInit()

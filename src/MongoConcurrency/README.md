@@ -51,6 +51,14 @@ Entity2 save
 
 ## Pattern rules
 - foreach object you want to keep tracking change of fields
+    - allocate `_TrackChanges` at constructor time for runtime new objects
+    ```csharp
+    public NestedDocumentEntity()
+    {
+        _TrackChanges = new MongoEntityTrackChanges();
+    }
+    ```
+
     - implements `IMongoEntityTrackChanges` interface:
     ```csharp
     #region IMongoEntityTrackChanges
@@ -76,6 +84,22 @@ Entity2 save
         _TrackChanges = new MongoEntityTrackChanges();
     }
     #endregion
+    ```
+
+    - operations on sets **add**
+    ```csharp
+    // add item1
+    var newItem1 = new NestedDocumentEntity() { C = "ee1", D = "ff1" };
+    Entity1.Children.Add(newItem1); // add to OBC
+    Entity1.Children.SetAsNew(Entity1, newItem1); // set as added
+    ```
+
+    - operations on sets **del**
+    ```chsarp
+    // del item2
+    var oldItem2 = Entity2.Children.Skip(1).First();
+    Entity2.Children.Remove(oldItem2); // remove from OBC                
+    Entity2.Children.SetAsDeleted(Entity2, oldItem2); // set as deleted 
     ```
 
     - save changes using `UpdateWithTrack` extension to the entity.
