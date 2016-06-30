@@ -77,6 +77,7 @@ Entity2 save
     #region ISupportInitialize
     public void BeginInit()
     {
+        _TrackChanges = null;
     }
 
     public void EndInit()
