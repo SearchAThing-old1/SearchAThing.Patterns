@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SearchAThing.MongoDB;
+using System;
 
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
@@ -62,6 +63,16 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
         protected void SendPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void BeforeSave()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AfterSave()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 
