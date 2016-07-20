@@ -28,9 +28,9 @@ using SearchAThing.Patterns.MongoDBWpf.Ents;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Linq;
-using Repository.Mongo;
 using SearchAThing;
 using MongoDB.Bson.Serialization;
+using SearchAThing.MongoDB;
 
 namespace SearchAThing.Patterns.MongoDBWpf
 {
@@ -96,22 +96,33 @@ namespace SearchAThing.Patterns.MongoDBWpf
         }
         #endregion
 
+        MongoContext ctx;
+        MongoContext ctx1;
+        MongoContext ctx2;
+
         void LoadEntityDBCurrent()
         {
-            var repo = new Repository<DocumentEntity>(ConnectionString);
-            EntityDBCurrent = repo.FindAll().First();
+            var _CTX = new MongoContext(ConnectionString);
+            EntityDBCurrent = _CTX.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            ctx = new MongoContext(ConnectionString);
+            ctx1 = new MongoContext(ConnectionString);
+            ctx2 = new MongoContext(ConnectionString);
         }
 
         private void Load_Click(object sender, RoutedEventArgs e)
         {
             {
-                var repo = new Repository<DocumentEntity>(ConnectionString);
-                repo.FindAll().ToList().Foreach(w => repo.Delete(w));
-                var doc = new DocumentEntity() { A = "a", B = "b" };
+                var coll = ctx.GetRepository<DocumentEntity>().Collection;
+                coll.AsQueryable().Foreach(w => ctx.Delete(w));
+                ctx.Save();
+
+                var doc = ctx.New<DocumentEntity>();
+                doc.A = "a";
+                doc.B = "b";
                 doc.Nested.C = "c"; doc.Nested.D = "d";
                 {
                     var obc = new ObservableCollection<NestedDocumentEntity>();
@@ -119,17 +130,15 @@ namespace SearchAThing.Patterns.MongoDBWpf
                     obc.Add(new NestedDocumentEntity() { C = "ee", D = "ff" });
                     doc.Children = obc;
                 }
-                repo.Insert(doc);
+                ctx.Save(); // save changes created document
             }
 
             {
-                var repo = new Repository<DocumentEntity>(ConnectionString);
-                Entity1 = repo.FindAll().First();
+                Entity1 = ctx1.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
             }
 
             {
-                var repo = new Repository<DocumentEntity>(ConnectionString);
-                Entity2 = repo.FindAll().First();
+                Entity2 = ctx2.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
             }
 
             LoadEntityDBCurrent();
@@ -143,8 +152,7 @@ namespace SearchAThing.Patterns.MongoDBWpf
             {
                 // add item1
                 var newItem1 = new NestedDocumentEntity() { C = "ee1", D = "ff1" };
-                Entity1.Children.Add(newItem1); // add to OBC
-                Entity1.Children.SetAsNew(Entity1, newItem1); // set as added
+                Entity1.Children.Add(newItem1); // add to OBC                
             }
 
             Entity2.B = "b2";
@@ -153,28 +161,20 @@ namespace SearchAThing.Patterns.MongoDBWpf
             {
                 // del item2
                 var oldItem2 = Entity2.Children.Skip(1).First();
-                Entity2.Children.Remove(oldItem2); // remove from OBC                
-                Entity2.Children.SetAsDeleted(Entity2, oldItem2); // set as deleted                
+                Entity2.Children.Remove(oldItem2); // remove from OBC                                
             }
         }
 
         private void Save1_Click(object sender, RoutedEventArgs e)
         {
-            var repo = new Repository<DocumentEntity>(ConnectionString);
-
-            var id = Entity1.Id;
-
-            Entity1.UpdateWithTrack(repo); // commit with track changes
+            ctx1.Save();
 
             LoadEntityDBCurrent();
         }
 
         private void Save2_Click(object sender, RoutedEventArgs e)
         {
-            var repo = new Repository<DocumentEntity>(ConnectionString);
-            var id = Entity2.Id;
-
-            Entity2.UpdateWithTrack(repo); // commit with track changes
+            ctx2.Save();
 
             LoadEntityDBCurrent();
         }

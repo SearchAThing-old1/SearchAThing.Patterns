@@ -1,11 +1,9 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using Repository.Mongo;
+﻿using SearchAThing.MongoDB;
 
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
-    public class Contact : Entity
+    public class Contact : MongoEntity
     {
         public string Name { get; set; }
         public string Phone { get; set; }

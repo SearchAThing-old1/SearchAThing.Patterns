@@ -29,7 +29,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Linq;
-using Repository.Mongo;
+using SearchAThing.MongoDB;
 
 namespace SearchAThing.Patterns.MongoDBWpf
 {
@@ -38,7 +38,10 @@ namespace SearchAThing.Patterns.MongoDBWpf
     {
         
         ObservableCollection<Contact> obc;
-        Repository<Contact> contacts;
+        MongoContext ctx;
+        ITypedMongoRepository<Contact> contacts;
+
+        //Repository<Contact> contacts;
 
         public MainWindow()
         {
@@ -50,23 +53,24 @@ namespace SearchAThing.Patterns.MongoDBWpf
         private void Dg_RowEditEnding(object sender, System.Windows.Controls.DataGridRowEditEndingEventArgs e)
         {
             var item = (Contact)e.Row.Item;
-            // take care here that update save entire object,
-            // not only changed fields
-            contacts.Update(item);            
+            ctx.Save(); // save only changed fields
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            contacts = new Repository<Contact>("mongodb://localhost:27017/searchathing_patterns_mongodbwpf");            
-            obc = new ObservableCollection<Contact>(contacts.FindAll());
+            ctx = new MongoContext("mongodb://localhost:27017/searchathing_patterns_mongodbwpf");
+            contacts = ctx.GetRepository<Contact>();
+            obc = new ObservableCollection<Contact>(contacts.Collection.AsQueryable());
             dg.ItemsSource = obc;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            var newContact = new Contact() { Name = "newName", Phone = "newPhone" };
+            var newContact = ctx.New<Contact>();
+            newContact.Name = "newName";
+            newContact.Phone = "newPhone";            
             obc.Add(newContact);
-            contacts.Insert(newContact);
+            ctx.Save(); // save inserted contact
         }
 
         private void Del_Click(object sender, RoutedEventArgs e)
@@ -77,8 +81,9 @@ namespace SearchAThing.Patterns.MongoDBWpf
             foreach (var x in sel)
             {
                 obc.Remove(x);
-                contacts.Delete(x);
+                x.Delete();
             }
+            ctx.Save(); // delete seleced contacts
 
             if (curIdx < dg.Items.Count) dg.SelectedIndex = curIdx;
             else if (dg.Items.Count > 0) dg.SelectedIndex = dg.Items.Count - 1;

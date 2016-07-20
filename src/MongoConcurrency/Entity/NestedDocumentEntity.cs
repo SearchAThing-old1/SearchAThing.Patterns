@@ -31,30 +31,12 @@ using System;
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
-    public class NestedDocumentEntity : INotifyPropertyChanged, IMongoEntityTrackChanges, ISupportInitialize
+    public class NestedDocumentEntity : INotifyPropertyChanged
     {
 
         public NestedDocumentEntity()
-        {
-            _TrackChanges = new MongoEntityTrackChanges();
-        }
-
-        #region IMongoEntityTrackChanges
-        MongoEntityTrackChanges _TrackChanges;
-        public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }
-        #endregion
-
-        #region ISupportInitialize
-        public void BeginInit()
-        {
-            _TrackChanges = null;
-        }
-
-        public void EndInit()
-        {
-            _TrackChanges = new MongoEntityTrackChanges();
-        }
-        #endregion
+        {            
+        }            
 
         #region INotifyPropertyChanged [pce]       
         public event PropertyChangedEventHandler PropertyChanged;
@@ -86,8 +68,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_C != value)
                 {
-                    _C = value;
-                    TrackChanges?.ChangedProperties.Add("C"); // use of ? operator ( until endinit is null )
+                    _C = value;                    
                     SendPropertyChanged("C");
                 }
             }
@@ -106,8 +87,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_D != value)
                 {
-                    _D = value;
-                    TrackChanges?.ChangedProperties.Add("D"); // use of ? operator ( until endinit is null )
+                    _D = value;                   
                     SendPropertyChanged("D");
                 }
             }

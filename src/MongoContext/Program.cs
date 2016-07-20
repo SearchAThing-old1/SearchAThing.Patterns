@@ -1,11 +1,7 @@
-﻿using Repository.Mongo;
+﻿using MongoDB.Driver;
 using SearchAThing.MongoDB;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SearchAThing.Patterns.MongoContextSample
 {
@@ -18,8 +14,10 @@ namespace SearchAThing.Patterns.MongoContextSample
 
 
             {
-                var ctx = new Repository<SampleA>("mongodb://localhost:27017/searchathing_mongocontextsample");
-                ctx.Delete(x => true);                
+                var ctx = new MongoContext("mongodb://localhost:27017/searchathing_mongocontextsample");
+                var repo = ctx.GetRepository<SampleA>();
+
+                repo.Collection.DeleteMany(Builders<SampleA>.Filter.Empty);                         
             }
 
             {
@@ -35,11 +33,10 @@ namespace SearchAThing.Patterns.MongoContextSample
             {
                 var ctx = new MongoContext("mongodb://localhost:27017/searchathing_mongocontextsample");
 
-                var q = ctx.Find<SampleA>(x => true).First();
-                q.TestProperty = "xxx12";
+                var q = ctx.Find<SampleA>(x => true).First();                
                 q.SampleB.Data = "data12";
 
-                ctx.Save();
+                ctx.Save(); // TestProperty preserved - only modified fields are saved
             }
             
         }

@@ -23,7 +23,6 @@
 */
 #endregion
 
-using Repository.Mongo;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,46 +32,18 @@ using System;
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
-    public class DocumentEntity : Entity, INotifyPropertyChanged, IMongoEntityTrackChanges, ISupportInitialize
+    public class DocumentEntity : MongoEntity, INotifyPropertyChanged
     {
 
         public DocumentEntity()
-        {
-            _TrackChanges = new MongoEntityTrackChanges();
+        {            
         }
-
-        #region IMongoEntityTrackChanges
-        MongoEntityTrackChanges _TrackChanges;       
-        public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }        
-        #endregion
-
-        #region ISupportInitialize
-        public void BeginInit()
-        {
-            _TrackChanges = null;
-        }
-
-        public void EndInit()
-        {
-            _TrackChanges = new MongoEntityTrackChanges();
-        }
-        #endregion
 
         #region INotifyPropertyChanged [pce]       
         public event PropertyChangedEventHandler PropertyChanged;
         protected void SendPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void BeforeSave()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AfterSave()
-        {
-            throw new NotImplementedException();
         }
         #endregion
 
@@ -88,8 +59,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_A != value)
                 {
-                    _A = value;
-                    TrackChanges?.ChangedProperties.Add("A"); // use of ? operator ( until endinit is null )
+                    _A = value;                    
                     SendPropertyChanged("A");
                 }
             }
@@ -108,8 +78,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_B != value)
                 {
-                    _B = value;
-                    TrackChanges?.ChangedProperties.Add("B"); // use of ? operator ( until endinit is null )
+                    _B = value;                    
                     SendPropertyChanged("B");
                 }
             }

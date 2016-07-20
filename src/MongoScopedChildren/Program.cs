@@ -24,8 +24,9 @@
 #endregion
 
 using MongoDB.Bson.Serialization.Attributes;
-using Repository.Mongo;
+using MongoDB.Driver;
 using SearchAThing.Core;
+using SearchAThing.MongoDB;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,20 +40,22 @@ namespace MongoScopedChildren
         static void Main(string[] args)
         {
 
-            var repo = new Repository<BaseDoc>("mongodb://localhost:27017/searchathing_patterns_mongoscopedchildren");
+            var ctx = new MongoContext("mongodb://localhost:27017/searchathing_patterns_mongoscopedchildren");
+            var repo = ctx.GetRepository<BaseDoc>();
 
             {
-                repo.Delete((x) => true);
+                var filter = Builders<BaseDoc>.Filter.Empty;
+                repo.Collection.DeleteMany(filter);
             }
 
             {
                 var A = new BaseDoc();
                 A.Child = new ChildClass(A);
-                repo.Insert(A);
+                repo.GenericInsert(ctx, A);
             }
 
             {
-                var A = repo.FindAll().First();
+                var A = repo.Collection.AsQueryable().First();
                 A.Child.DoSomeJob();
             }
 
@@ -64,7 +67,7 @@ namespace MongoScopedChildren
     /// Base document is the collection document, it need to:
     /// - implement ISupportInitialize to bind child to itself in the EndInit()    
     /// </summary>
-    public class BaseDoc : Entity, ISupportInitialize
+    public class BaseDoc : MongoEntity, ISupportInitialize
     {
 
         #region ISupportInitialize
