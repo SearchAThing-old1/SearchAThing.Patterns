@@ -40,3 +40,7 @@ Access the root document from the nested child objects.
 Handles in a semi-automatic way update of only changed fields.
 
 [Example](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/MongoConcurrency)
+
+## C++ Interfacing
+
+In this [example](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/CPPClassInterfacing) is shown how to call C++ methods from a managed [library](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/CPPClassTest) ( just add the /clr flag to the C++ compilation ).
