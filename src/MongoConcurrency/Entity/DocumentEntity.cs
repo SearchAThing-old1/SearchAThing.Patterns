@@ -27,25 +27,24 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SearchAThing.MongoDB;
+using MongoDB.Driver.Linq;
+using MongoDB.Driver;
+using MongoDB;
+using System.Linq;
 using System;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Specialized;
 
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
+    [BsonIgnoreExtraElements]
     public class DocumentEntity : MongoEntity, INotifyPropertyChanged
     {
 
         public DocumentEntity()
-        {            
-        }
-
-        #region INotifyPropertyChanged [pce]       
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void SendPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
 
         #region A [pc]
         string _A;
@@ -59,7 +58,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_A != value)
                 {
-                    _A = value;                    
+                    _A = value;
                     SendPropertyChanged("A");
                 }
             }
@@ -78,7 +77,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             {
                 if (_B != value)
                 {
-                    _B = value;                    
+                    _B = value;
                     SendPropertyChanged("B");
                 }
             }
@@ -91,7 +90,7 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
         {
             get
             {
-                if (_Nested == null) _Nested = new NestedDocumentEntity();
+                if (_Nested == null) _Nested = MongoContext.New(new NestedDocumentEntity("", ""));
                 return _Nested;
             }
             set
@@ -107,22 +106,39 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
 
         #region Children [pc]
         ObservableCollection<NestedDocumentEntity> _Children;
+        [BsonIgnore]
         public ObservableCollection<NestedDocumentEntity> Children
         {
             get
             {
+                if (_Children == null)                
+                    _Children = MongoContext.LoadOBC<NestedDocumentEntity>(ChildrenIds);                                    
+
                 return _Children;
+            }             
+        }
+        #endregion
+
+        #region ChildrenIds [pc]
+        List<string> _ChildrenIds;
+        public List<string> ChildrenIds
+        {
+            get
+            {
+                if (_ChildrenIds == null) _ChildrenIds = new List<string>();
+                return _ChildrenIds;
             }
             set
             {
-                if (_Children != value)
+                if (_ChildrenIds != value)
                 {
-                    _Children = value;
-                    SendPropertyChanged("Children");
+                    _ChildrenIds = value;
+                    SendPropertyChanged("ChildrenIds");
                 }
             }
         }
         #endregion
+
 
     }
 

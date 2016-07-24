@@ -103,7 +103,8 @@ namespace SearchAThing.Patterns.MongoDBWpf
         void LoadEntityDBCurrent()
         {
             var _CTX = new MongoContext(ConnectionString);
-            EntityDBCurrent = _CTX.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
+            EntityDBCurrent = _CTX.GetRepository<DocumentEntity>().Collection.AsQueryable().Attach(_CTX).First();
+            var q = EntityDBCurrent.Nested;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -116,29 +117,39 @@ namespace SearchAThing.Patterns.MongoDBWpf
         private void Load_Click(object sender, RoutedEventArgs e)
         {
             {
-                var coll = ctx.GetRepository<DocumentEntity>().Collection;
-                coll.AsQueryable().Foreach(w => ctx.Delete(w));
-                ctx.Save();
+                {
+                    var coll = ctx.GetRepository<DocumentEntity>().Collection;
+                    coll.AsQueryable().Foreach(w => ctx.Delete(w));
+                    ctx.Save();
+                }
+
+                {
+                    var coll = ctx.GetRepository<NestedDocumentEntity>().Collection;
+                    coll.AsQueryable().Foreach(w => ctx.Delete(w));
+                    ctx.Save();
+                }
 
                 var doc = ctx.New<DocumentEntity>();
                 doc.A = "a";
                 doc.B = "b";
                 doc.Nested.C = "c"; doc.Nested.D = "d";
                 {
-                    var obc = new ObservableCollection<NestedDocumentEntity>();
-                    obc.Add(new NestedDocumentEntity() { C = "cc", D = "dd" });
-                    obc.Add(new NestedDocumentEntity() { C = "ee", D = "ff" });
-                    doc.Children = obc;
+                    var obc = doc.Children;
+
+                    obc.Clear();
+                    obc.Add(ctx.New(new NestedDocumentEntity("xx", "yy")));
+                    obc.Add(ctx.New(new NestedDocumentEntity("cc", "dd")));
+                    obc.Add(ctx.New(new NestedDocumentEntity("ee", "ff")));
                 }
                 ctx.Save(); // save changes created document
             }
 
             {
-                Entity1 = ctx1.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
+                Entity1 = ctx1.GetRepository<DocumentEntity>().Collection.AsQueryable().Attach(ctx1).First();
             }
 
             {
-                Entity2 = ctx2.GetRepository<DocumentEntity>().Collection.AsQueryable().First();
+                Entity2 = ctx2.GetRepository<DocumentEntity>().Collection.AsQueryable().Attach(ctx2).First();
             }
 
             LoadEntityDBCurrent();
@@ -148,20 +159,21 @@ namespace SearchAThing.Patterns.MongoDBWpf
         {
             Entity1.A = "a1";
             Entity1.Nested.C = "c1";
-            Entity1.Children.First().C = "cc1";
+            Entity1.Children.Skip(1).First().C = "cc1";
             {
                 // add item1
-                var newItem1 = new NestedDocumentEntity() { C = "ee1", D = "ff1" };
+                var newItem1 = ctx1.New(new NestedDocumentEntity("ee1", "ff1"));
                 Entity1.Children.Add(newItem1); // add to OBC                
             }
 
             Entity2.B = "b2";
             Entity2.Nested.D = "d2";
-            Entity2.Children.First().D = "dd2";
+            Entity2.Children.Skip(1).First().D = "dd2";
             {
                 // del item2
-                var oldItem2 = Entity2.Children.Skip(1).First();
-                Entity2.Children.Remove(oldItem2); // remove from OBC                                
+                var oldItem2 = Entity2.Children.Skip(2).First();
+                Entity2.Children.Remove(oldItem2); // remove from OBC
+                oldItem2.Delete(); // db
             }
         }
 

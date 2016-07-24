@@ -27,15 +27,19 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using SearchAThing.MongoDB;
 using System;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace SearchAThing.Patterns.MongoDBWpf.Ents
 {
 
-    public class NestedDocumentEntity : INotifyPropertyChanged
+    [BsonIgnoreExtraElements]
+    public class NestedDocumentEntity : MongoEntity, INotifyPropertyChanged
     {
 
-        public NestedDocumentEntity()
-        {            
+        public NestedDocumentEntity(string _C, string _D)
+        {
+            C = _C;
+            D = _D;            
         }            
 
         #region INotifyPropertyChanged [pce]       
@@ -93,6 +97,11 @@ namespace SearchAThing.Patterns.MongoDBWpf.Ents
             }
         }
         #endregion
+
+        public override string ToString()
+        {
+            return $"C=[{C}] D=[{D}]";
+        }
 
 
     }

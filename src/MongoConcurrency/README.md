@@ -6,7 +6,16 @@ Some patterns to allow keep track of changed fields.
 
 ## Example db structure
 
-![img](images/0_structure.PNG)
+### NestedDocument collection
+
+![img](images/0_structure-nested-document.PNG)
+
+- first item of the above example is used directly in the DocumentEntity as "Nested" field
+- other items are used by the many-to-one relation between DocumentEntity.ChildrenIds and NestedDocuments
+
+### DocumentEntity collection
+
+![img](images/0_structure-document-entity.PNG)
 
 The collection contains DocumentEntity types, which inside contains two simple properties A, B plus one subitem of type NestedDocumentEntity and an Observablecollection of the same type.
 
@@ -15,7 +24,7 @@ The collection contains DocumentEntity types, which inside contains two simple p
 Here the same record of the collection is loaded twice with two separate connections.
 First column Entity1 object.
 Second column Entity2 object.
-Third column after display current db content after each opeation. 
+Third column after display current db content after each operation. 
 
 ![img](images/1_load.PNG)
 
@@ -24,12 +33,12 @@ Third column after display current db content after each opeation.
 ```
 Entity1.A = a1
 Entity1.Nested.C = c1
-Entity1.Children.First().C = cc1
+Entity1.Children.Second().C = cc1
 Entity1.Children.Add(new { C = ee1, D = ff1 })
 
 Entity2.B = b2
 Entity2.Nested.D = d2
-Entity2.Children.First().D = dd2
+Entity2.Children.Second().D = dd2
 Entity2.Children.Delete: 2th ( C = ee, D = ff )
 ```
 
@@ -50,59 +59,103 @@ Entity2 save
 ![img](images/4_save.PNG)
 
 ## Pattern rules
-- foreach object you want to keep tracking change of fields
-    - allocate `_TrackChanges` at constructor time for runtime new objects
-    ```csharp
-    public NestedDocumentEntity()
+
+### Entity types
+
+- Define each entity you want to save in a specific collection inherit from the `SearchAThing.MongoDB.MongoEntity` type. Ths will ensure:
+    - an object Id
+    - methods extensions ( Delete )
+    - event triggering BeforeSave, AfterSave
+    - automatic per-field updates
+
+```csharp
+public class NestedDocumentEntity : MongoEntity, INotifyPropertyChanged
+{
+    // ...
+}
+```
+
+### Many-to-one relation
+
+- Define two properties:
+    - a non serializable ObservableCollection to be used as model. Add and removal will be reflected as entity insertion and removal from another collection. Implements only:
+        - getter to auto-initialize using MongoContext.LoadOBC method.
+    - a serializable `List<string>` to hold ids    
+
+```csharp
+#region Children [pc]
+ObservableCollection<NestedDocumentEntity> _Children;
+[BsonIgnore]
+public ObservableCollection<NestedDocumentEntity> Children
+{
+    get
     {
-        _TrackChanges = new MongoEntityTrackChanges();
-    }
-    ```
+        if (_Children == null)                
+            _Children = MongoContext.LoadOBC<NestedDocumentEntity>(ChildrenIds);                                    
 
-    - implements `IMongoEntityTrackChanges` interface:
-    ```csharp
-    #region IMongoEntityTrackChanges
-    MongoEntityTrackChanges _TrackChanges;       
-    public MongoEntityTrackChanges TrackChanges { get { return _TrackChanges; } }        
-    #endregion
-    ```
+        return _Children;
+    }             
+}
+#endregion
 
-    - when not null add the changed property name to the ChangedProperties hashset. In fact this will be null during the loading phase in order to avoid auto-change:
-    ```csharp
-    TrackChanges?.ChangedProperties.Add("A"); // use of ? operator ( until endinit is null )
-    ```
-
-    - implements `ISupportInitialize` interface. This way allow to allocate ChangedProperties hashset to be used when properties will be changed:
-    ```csharp
-    #region ISupportInitialize
-    public void BeginInit()
+#region ChildrenIds [pc]
+List<string> _ChildrenIds;
+public List<string> ChildrenIds
+{
+    get
     {
+        if (_ChildrenIds == null) _ChildrenIds = new List<string>();
+        return _ChildrenIds;
     }
-
-    public void EndInit()
+    set
     {
-        _TrackChanges = new MongoEntityTrackChanges();
+        if (_ChildrenIds != value)
+        {
+            _ChildrenIds = value;
+            SendPropertyChanged("ChildrenIds");
+        }
     }
-    #endregion
-    ```
+}
+#endregion
+```
 
-    - operations on sets **add**
-    ```csharp
-    // add item1
-    var newItem1 = new NestedDocumentEntity() { C = "ee1", D = "ff1" };
-    Entity1.Children.Add(newItem1); // add to OBC
-    Entity1.Children.SetAsNew(Entity1, newItem1); // set as added
-    ```
+### Load entities from MongoContext Collection
 
-    - operations on sets **del**
-    ```chsarp
-    // del item2
-    var oldItem2 = Entity2.Children.Skip(1).First();
-    Entity2.Children.Remove(oldItem2); // remove from OBC                
-    Entity2.Children.SetAsDeleted(Entity2, oldItem2); // set as deleted 
-    ```
+In order to ensure entities are tracked for their per-field changes when Save, use the `Attach(MongoContext ctx)` extension method before to use entities after any Load operation.
 
-    - save changes using `UpdateWithTrack` extension to the entity.
-    ```csharp
-    Entity1.UpdateWithTrack(repo);
-    ```
+```csharp
+Entity1 = ctx1.GetRepository<DocumentEntity>().Collection.AsQueryable().Attach(ctx1).First();
+```
+
+### Add new object
+
+In order to ensure entities are tracked for their per-field changes when Save, use the MongoContext.New<T>() or MongoContext.New<T>(T instance) method to create the instance and attach the context.
+
+```csharp
+var doc = ctx.New<DocumentEntity>();
+doc.A = "a";
+doc.B = "b";
+``` 
+
+### Drop a collection content
+
+In this case there is no need to attach the entity.
+
+```csharp
+var coll = ctx.GetRepository<DocumentEntity>().Collection;
+coll.AsQueryable().Foreach(w => ctx.Delete(w));
+ctx.Save();
+```
+
+### Delete object from an OBC and from DB
+
+- to remove an entity from the OBC simply use the Remove method of the OBC
+- if want to remove the entity from their collection too, use the Delete() extension method for any attached entities to remove
+- Note: changes will be reflected on Save()
+
+```csharp
+var oldItem2 = Entity2.Children.Skip(2).First();
+Entity2.Children.Remove(oldItem2); // remove from OBC
+oldItem2.Delete(); // db
+```
+
