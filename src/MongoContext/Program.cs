@@ -33,7 +33,8 @@ namespace SearchAThing.Patterns.MongoContextSample
             {
                 var ctx = new MongoContext("mongodb://localhost:27017/searchathing_mongocontextsample");
 
-                var q = ctx.Find<SampleA>(x => true).First();                
+                var q = ctx.GetRepository<SampleA>().Collection.AsQueryable()
+                    .Attach(ctx).First();                
                 q.SampleB.Data = "data12";
 
                 ctx.Save(); // TestProperty preserved - only modified fields are saved
