@@ -15,6 +15,7 @@
 - file [Book1.xlsm](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/Singles/XlsMacroEval/XlsMacroEval/Book1.xlsm) contains a sheet like the following
 
 | 1 | 2 | 3 |
+|---|---|---|
 | 6 | | |
 
 where 60 is the result of a formula containing a macro : "=Macro1(A1:C1)"
