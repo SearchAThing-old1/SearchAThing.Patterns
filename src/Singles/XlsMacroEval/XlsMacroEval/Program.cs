@@ -61,6 +61,8 @@ namespace XlsMacroEval
                 wb.Close(saveChanges);
 
                 xl.Visible = false;
+
+                xl.Quit();
             }
             catch (Exception ex)
             {
