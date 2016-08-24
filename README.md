@@ -1,46 +1,25 @@
-# SearchAThing.Patterns
+# Patterns
 
-Software patterns
-
-## Build
-
-There are many dependencies between projects in relative path directly from other source repositories,
-in order to build successfully its suggested to clone follow repository [SearchAThing](https://github.com/devel0/SearchAThing) containing all of them.
+> SearchAThing [build notes](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing)
 
 ## GUI
 
-### UITask
+- [UITask](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/UITask)
 
-Task and GUI Dispatcher annotations ( see [here](https://searchathing.com/?p=1470) ).
+- [StatusBarTaskDispatcher](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/StatusBarTaskDispatcher)
 
-[Code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/StatusBarTaskDispatcher/MainWindow.xaml.cs)
+## Interop
 
-### StatusBarTaskDispatcher
+- [Excel formula w/macro eval](- [UITask](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/Singles/XlsMacroEval)
 
-Update a statusbar using Task.
+## Database
 
-[Code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/StatusBarTaskDispatcher/MainWindow.xaml.cs)
+- [Mongo GUI Wpf](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/MongoDBWpf)
 
-## Mongo DB
+- [Mongo scoped children](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/MongoScopedChildren)
 
-### MongoDBWpf
+- [Mongo concurrency](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/MongoConcurrency)
 
-Mongodb GUI WPF mappings.
+## C++
 
-[Code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/MongoDBWpf/MainWindow.xaml.cs)
-
-### MongoScopedChildren
-
-Access the root document from the nested child objects.
-
-[Code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/MongoScopedChildren/Program.cs)
-
-### MongoConcurrency
-
-Handles in a semi-automatic way update of only changed fields.
-
-[Example](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/MongoConcurrency)
-
-## C++ Interfacing
-
-In this [example](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/CPPClassInterfacing) is shown how to call C++ methods from a managed [library](https://github.com/devel0/SearchAThing.Patterns/tree/master/src/CPPClassTest) ( just add the /clr flag to the C++ compilation ).
+- [Call C++ CLI method](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/CPPClassInterfacing) from [managed code](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/SearchAThing/CPPClassTest)
