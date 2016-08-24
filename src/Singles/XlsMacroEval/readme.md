@@ -16,9 +16,9 @@
 
 | 1 | 2 | 3 |
 |---|---|---|
-| 6 | | |
+| 6 |   |   |
 
-where 60 is the result of a formula containing a macro : "=Macro1(A1:C1)"
+where 6 ( cell A2 ) is the result of a formula containing a macro : "=Macro1(A1:C1)"
 
 and the macro is defined as follow VBA code
 
