@@ -10,7 +10,7 @@
 
 ## Interop
 
-- [Excel formula w/macro eval](- [UITask](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/Singles/XlsMacroEval)
+- [Excel formula w/macro eval](https://github.com/devel0/SearchAThing.Patterns/blob/master/src/Singles/XlsMacroEval)
 
 ## Database
 
